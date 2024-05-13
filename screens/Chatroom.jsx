@@ -1,23 +1,40 @@
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TextInput,
-  ScrollView,
-  TouchableOpacity,
-  Vibration,
-} from "react-native";
+import {StyleSheet,Text,View,Image,TextInput,ScrollView,TouchableOpacity,Vibration,} from "react-native";
 import { SafeAreaView } from "react-native";
+import { getDatabase } from "firebase/database";
+import {ref, set } from "firebase/database";
+import firebase from "firebase/compat/app";
 export default function Chatroom() {
   const [text, setText] = useState("");
   const [msg, setMsg] = useState("");
+  const database = getDatabase();
+  const firestore = firebase.firestore();
+  const messagesRef = firestore.collection("messages");
+  const query = messagesRef.orderBy("createdAt").limit(1000);
+  const [messages] = useCollectionData(query, { idField: "id" });
+  const sendMessage = async (e) => {
+    e.preventDefault();
+    const { uid, photoURL } = auth.currentUser;
+    await messagesRef.add({
+      text: formData,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      uid,
+      photoURL,
+    });
+    setFormData("");
 
+  };
   function handlesubmit() {
     Vibration.vibrate(100);
     setMsg(text);
+    function writemsgData() {
+      const db = getDatabase();
+      set(ref(db, 'chats/'), {
+        chat: msg,
+      });
+    }
+    writemsgData();
   }
 
   return (
@@ -32,16 +49,20 @@ export default function Chatroom() {
       </View>
 
       <ScrollView style={StyleSheet.t}>
+        <Image style={styles.user1}source={require("../assets/user icon.jpg")}></Image>
+      <Text style={styles.tex1}>Aiswarya</Text>
         <View style={styles.b}>
+        <Image style={styles.user2}source={require("../assets/dp2.jpg")}></Image>
+          <Text style={styles.tex2}>You</Text>
           <View style={styles.b1}>
             <Text>{msg}</Text>
           </View>
           <View style={styles.b2}></View>
-          <View style={styles.b3}></View>
-          <View style={styles.b4}></View>
-          <View style={styles.b5}></View>
         </View>
       </ScrollView>
+      <TouchableOpacity style={styles.shh}>
+        <Image style={styles.arr} source={require('../assets/arrow.jpg')}></Image>
+      </TouchableOpacity>
       <View style={styles.last}>
         <TextInput
           style={styles.b6}
@@ -79,9 +100,8 @@ const styles = StyleSheet.create({
   b1: {
     backgroundColor: "#EBEAEA",
     width: 230,
-    height: 40,
     borderRadius: 10,
-    left: 100,
+    left: 70,
     padding: 10,
     gap: 20,
   },
@@ -151,4 +171,32 @@ const styles = StyleSheet.create({
     paddingTop: 30,
     justifyContent: "space-between",
   },
+  tex1:{
+    top:185,
+    left:50,
+  },
+  tex2:{
+    left:280,
+    top:12,
+  },
+  arr:{
+    width:23,
+    height:23,
+  },
+  shh:{
+    left:335,
+    top:-19,
+  },
+  user1:{
+    width:25,
+    height:25,
+    left:300,
+    top:145,
+  },
+  user2:{
+    height:25,
+    width:25,
+    top:110,
+    left:-30,
+  }
 });

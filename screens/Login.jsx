@@ -3,10 +3,37 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View,Image ,TextInput,ScrollView, Touchable, TouchableOpacity} from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import {useState} from "react";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { Alert } from 'react-native';
 export default function Login() {
   const navigator=useNavigation()
-  const [username,setuserName]=useState('')
+  const [email,setEmail]=useState('')
   const [password,setpassword]=useState('')
+  const auth = getAuth();
+  signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      // Signed in 
+      const user = userCredential.user;
+      // ...
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+    });
+    function handleSubmit(){
+    const auth = getAuth();
+  signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      // Signed in 
+      const user = userCredential.user;
+      navigator.navigate("Chatroom")  
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      Alert.alert("failed to Signedin",errorMessage)
+    });
+    }
   return (
     <ScrollView  style={styles.container}>
       <View style={styles.sum}>
@@ -17,10 +44,10 @@ export default function Login() {
      <Text style={styles.Text}>CHAT ON</Text>
      <View style={styles.blue}>
      <View style={styles.boxes}>
-     <TextInput onChangeText={(value)=>console.log(value)} style={styles.input1} placeholder='enter username'></TextInput>
-     <TextInput onChangeText={(value)=>console.log(value)} style={styles.input2} placeholder='enter password'></TextInput>
+     <TextInput onChangeText={(value)=>setEmail(value)} style={styles.input1} placeholder='enter username'></TextInput>
+     <TextInput onChangeText={(value)=>setpassword(value)} style={styles.input2} placeholder='enter password'></TextInput>
      <TouchableOpacity style={styles.button}
-     onPress={() => navigator.navigate("Chatroom")}>
+     onPress={handleSubmit}>
       <Text style={styles.bt}>Login</Text>
      </TouchableOpacity>
      
@@ -100,10 +127,17 @@ const styles = StyleSheet.create({
     top:100,
   },
   bt:{
-    margin:20,
-    borderWidth:1,
-    borderColor:'white',
-   width:50,
-   height:30,
-  }
+    color:'white',
+  },
+ button:{
+  borderWidth:1,
+  borderColor:'white',
+  borderRadius:10,
+  height:40,
+  width:70,
+  alignItems:"center",
+  justifyContent:'center',
+  margin:26,
+ },
+
 });
